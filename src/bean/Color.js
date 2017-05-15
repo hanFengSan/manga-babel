@@ -3,7 +3,7 @@ class Point {
         this.r = r;
         this.g = g;
         this.b = b;
-        this.a = a || a;
+        this.a = a || 255;
     }
 }
 

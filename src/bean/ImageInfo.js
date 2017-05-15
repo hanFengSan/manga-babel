@@ -74,17 +74,17 @@ class ImageInfo {
     }
 
     _lineTo(pointX, pointY, color) {
-        if (pointX.x === pointY.x) {
-            this.dataMatrix[pointX.x].filter(pixel => pixel.y >= pointX.y && pixel.y <= pointY.y).forEach((pixel) => {
+        if (pointX.y === pointY.y) {
+            this.dataMatrix[pointX.y].filter(pixel => pixel.x >= pointX.x && pixel.x <= pointY.x).forEach((pixel) => {
                 pixel.r = color.r;
                 pixel.g = color.g;
                 pixel.b = color.b;
             });
         }
-        if (pointX.y === pointY.y) {
+        if (pointX.x === pointY.x) {
             this.dataMatrix.map(row => {
-                return row[pointX.y];
-            }).filter(pixel => pixel.x >= pointX.x && pixel.x <= pointY.x).forEach((pixel) => {
+                return row[pointX.x];
+            }).filter(pixel => pixel.y >= pointX.y && pixel.y <= pointY.y).forEach((pixel) => {
                 pixel.r = color.r;
                 pixel.g = color.g;
                 pixel.b = color.b;

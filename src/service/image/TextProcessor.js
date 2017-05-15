@@ -1,4 +1,5 @@
 import Point from 'src/bean/Point'
+import Color from 'src/bean/Color'
 
 class TextProcessor {
     findText(imageInfo) {
@@ -17,8 +18,8 @@ class TextProcessor {
             }
         });
         this._initRunParam(runs, imageInfo);
-        this._selectText(runs, imageInfo);
-        console.log(runs);
+        let filter = this._getTextRunsByCCLFeature(runs, imageInfo);
+        let secFilter = this._getTextRunsByProjection(filter, imageInfo);
         console.timeEnd('time findText');
     }
 
@@ -50,7 +51,8 @@ class TextProcessor {
         });
     }
 
-    _selectText(runs, imageInfo) {
+    // 根据字符高宽比, 大小相对于图片的范围, 邻域的字符数量等来筛选字符出字符连通域
+    _getTextRunsByCCLFeature(runs, imageInfo) {
         let firstFilter = [];
         runs.forEach((run, key, map) => {
             if (run.aspectRatio > 0.6 &&
@@ -63,7 +65,7 @@ class TextProcessor {
             }
         });
         let secondFilter = [];
-        let t = imageInfo.width / 25;
+        let t = imageInfo.width / 40;
         let neighborsNum = 2;
         let hasNeighbor = (run) => {
             let center = run.center;
@@ -74,7 +76,7 @@ class TextProcessor {
             let colBottomRight = new Point(center.x + 0.5 * t, center.y + 2.5 * t);
 
             let neighbors = [];
-            runs.forEach((val, key, map) => {
+            firstFilter.forEach((val) => {
                 let p = val.center;
                 if (p.x !== center.x || p.y !== center.y) {
                     if (p.isIn(rowLeftTop, rowRightBottom) || p.isIn(colTopLeft, colBottomRight)) {
@@ -100,7 +102,74 @@ class TextProcessor {
                 pixel.b = 0;
             });
         });
+        return secondFilter;
     }
+
+    _getTextRunsByProjection(filter, imageInfo) {
+        let xProjection = new Array(imageInfo.width).fill(0);
+        let yProjection = new Array(imageInfo.height).fill(0);
+        filter.forEach((run) => {
+            run.list.forEach((pixel) => {
+                xProjection[pixel.x]++;
+                yProjection[pixel.y]++;
+            })
+        });
+        for (let i = 0; i < yProjection.length; i++) {
+            if (yProjection[i] > 0) {
+                imageInfo._lineTo(new Point(0, i), new Point(yProjection[i], i), new Color(255, 0, 0));
+            }
+        }
+        for (let i = 0; i < xProjection.length; i++) {
+            if (xProjection[i] > 0) {
+                imageInfo._lineTo(new Point(i, imageInfo.height - xProjection[i]), new Point(i, imageInfo.height), new Color(255, 0, 0));
+            }
+        }
+
+        let xSections = [];
+        let xTmp = [0, 0];
+        for (let i = 0; i < xProjection.length; i++) {
+            if (xProjection[i] > 0) {
+                if (xTmp[0] === 0) {
+                    xTmp[0] = i;
+                }
+                xTmp[1] = i;
+            } else {
+                if (xTmp[0] > 0) {
+                    xSections.push([xTmp[0], xTmp[1]]);
+                    xTmp = [0, 0];
+                }
+            }
+        }
+
+        let ySections = [];
+        let yTmp = [0, 0];
+        for (let i = 0; i < yProjection.length; i++) {
+            if (yProjection[i] > 0) {
+                if (yTmp[0] === 0) {
+                    yTmp[0] = i;
+                }
+                yTmp[1] = i;
+            } else {
+                if (yTmp[0] > 0) {
+                    ySections.push([yTmp[0], yTmp[1]]);
+                    yTmp = [0, 0];
+                }
+            }
+        }
+
+        xSections.forEach((x) => {
+            ySections.forEach((y) => {
+                filter.forEach((run) => {
+                    let isContained = false;
+                    if (!isContained && run.center.isIn(new Point(x[0], y[0]), new Point(x[1], y[1]))) {
+                        imageInfo.selectArea(new Point(x[0], y[0]), new Point(x[1], y[1]), new Color(255, 0, 0));
+                        isContained = true;
+                    }
+                })
+            })
+        })
+    }
+
 }
 
 let instance = new TextProcessor();
