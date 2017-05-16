@@ -54,17 +54,17 @@ class TextProcessor {
     // 根据字符高宽比, 大小相对于图片的范围, 邻域的字符数量等来筛选字符出字符连通域
     _getTextRunsByCCLFeature(runs, imageInfo) {
         let firstFilter = [];
+        let secondFilter = [];
         runs.forEach((run, key, map) => {
-            if (run.aspectRatio > 0.6 &&
+            if (run.aspectRatio > 0.3 &&
                 run.aspectRatio < 3.5 &&
                 run.areaRatio < 0.01 &&
-                run.areaRatio > 0.00005 &&
+                run.areaRatio > 0.000035 &&
                 run.size > 20 &&
                 run.effectiveRatio > 0.2) {
                 firstFilter.push(run);
             }
         });
-        let secondFilter = [];
         let t = imageInfo.width / 40;
         let neighborsNum = 2;
         let hasNeighbor = (run) => {
@@ -84,17 +84,14 @@ class TextProcessor {
                     }
                 }
             });
-            if (neighbors.length >= neighborsNum) {
-                return true;
-            } else {
-                return false;
-            }
+            return neighbors.length >= neighborsNum;
         };
         firstFilter.forEach((run) => {
             if (hasNeighbor(run)) {
                 secondFilter.push(run);
             }
         });
+
         secondFilter.forEach((run) => {
             run.list.forEach((pixel) => {
                 pixel.r = 255;
