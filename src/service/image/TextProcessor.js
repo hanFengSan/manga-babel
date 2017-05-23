@@ -102,6 +102,14 @@ class TextProcessor {
         return secondFilter;
     }
 
+    _getTextArea(filter, imageInfo) {
+        let areaList = [];
+        let offset = imageInfo.width / 20;
+        filter.forEach((run) => {
+            
+        });
+    }
+
     _getTextRunsByProjection(filter, imageInfo) {
         let xProjection = new Array(imageInfo.width).fill(0);
         let yProjection = new Array(imageInfo.height).fill(0);

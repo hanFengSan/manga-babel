@@ -25,10 +25,10 @@ export default {
     created() {
         window.setTimeout(() => {
             // this.drawImage('./static/test.jpg');
-            this.getAndSetImageData('./static/test.jpg');
+            // this.getAndSetImageData('./static/test.jpg');
             // this.getAndSetImageData('./static/a.png');
             // this.getAndSetImageData('./static/CCL.jpg');
-            // this.getAndSetImageData('./static/test/indigo_inherit_06.jpg');
+            this.getAndSetImageData('./static/test/indigo_inherit_06.jpg');
         }, 100);
     },
 
