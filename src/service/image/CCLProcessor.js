@@ -49,7 +49,6 @@ class CCLProcessor {
                 }
             }
         }
-        // console.log(labels);
         console.timeEnd('time CLL');
         imageInfo.setCCL(labels);
     }

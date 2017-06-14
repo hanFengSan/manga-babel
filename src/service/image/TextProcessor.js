@@ -1,11 +1,12 @@
 import Point from 'src/bean/Point'
 import Color from 'src/bean/Color'
+import Run from 'src/bean/Run'
+import TextAreaProcessor from './TextAreaProcessor'
 
 class TextProcessor {
     findText(imageInfo) {
         console.time('time findText');
-        let labels = new Set();
-        imageInfo.getPixels().forEach(i => labels.add(i));
+        // 初始化连通域list
         let runs = new Map();
         imageInfo.getPixels().forEach((i) => {
             if (i.label === 0) {
@@ -14,12 +15,14 @@ class TextProcessor {
             if (runs.has(i.label)) {
                 runs.get(i.label).list.push(i);
             } else {
-                runs.set(i.label, { list: [i] });
+                runs.set(i.label, new Run([i]));
             }
         });
         this._initRunParam(runs, imageInfo);
+        // 过滤run
         let filter = this._getTextRunsByCCLFeature(runs, imageInfo);
-        let secFilter = this._getTextRunsByProjection(filter, imageInfo);
+        TextAreaProcessor.selectTextArea(imageInfo, filter);
+        // let secFilter = this._getTextRunsByProjection(filter, imageInfo);
         console.timeEnd('time findText');
     }
 
@@ -110,6 +113,7 @@ class TextProcessor {
         });
     }
 
+    // 计算连通域的投影, 并圈起来
     _getTextRunsByProjection(filter, imageInfo) {
         let xProjection = new Array(imageInfo.width).fill(0);
         let yProjection = new Array(imageInfo.height).fill(0);
