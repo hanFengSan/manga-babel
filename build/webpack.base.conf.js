@@ -26,6 +26,9 @@ module.exports = {
             'src': resolve('src')
         }
     },
+    node: {
+        fs: 'empty'
+    },
     module: {
         rules: [{
                 test: /\.vue$/,

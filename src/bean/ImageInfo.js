@@ -17,9 +17,9 @@ class ImageInfo {
         return result;
     }
 
-    toImageData() {
+    toImageData(matrix, width, height) {
         let data = [];
-        this.dataMatrix.forEach((row) => {
+        (matrix || this.dataMatrix).forEach((row) => {
             row.forEach((pixel) => {
                 data.push(pixel.r);
                 data.push(pixel.g);
@@ -27,12 +27,19 @@ class ImageInfo {
                 data.push(pixel.a);
             });
         });
-        let result = new window.ImageData(this.width, this.height);
+        let result = new window.ImageData((width || this.width), (height || this.height));
         for (let i = 0; i < result.data.length; i++) {
             result.data[i] = data[i];
         }
-        console.log(result);
         return result;
+    }
+
+    getClipInstance(pointX, pointY) {
+        let newMatrix = this.dataMatrix.slice(pointX.y, pointY.y);
+        for (let i = 0; i < newMatrix.length; i++) {
+            newMatrix[i] = newMatrix[i].slice(pointX.x, pointY.x);
+        }
+        return new ImageInfo(this.toImageData(newMatrix, pointY.x - pointX.x, pointY.y - pointX.y));
     }
 
     selectArea(pointX, pointY, color) {

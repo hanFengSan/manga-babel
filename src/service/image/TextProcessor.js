@@ -20,10 +20,11 @@ class TextProcessor {
         });
         this._initRunParam(runs, imageInfo);
         // 过滤run
-        let filter = this._getTextRunsByCCLFeature(runs, imageInfo);
-        TextAreaProcessor.selectTextArea(imageInfo, filter);
-        // let secFilter = this._getTextRunsByProjection(filter, imageInfo);
+        // let filter = this._getTextRunsByCCLFeature(runs, imageInfo);
+        // TextAreaProcessor.selectTextArea(imageInfo, filter);
+        let areas = this._getTextRunsByProjection(runs, imageInfo);
         console.timeEnd('time findText');
+        return areas;
     }
 
     _initRunParam(runs, imageInfo) {
@@ -166,17 +167,23 @@ class TextProcessor {
             }
         }
 
+        let areas = [];
+
         xSections.forEach((x) => {
             ySections.forEach((y) => {
+                let isContained = false;
                 filter.forEach((run) => {
-                    let isContained = false;
                     if (!isContained && run.center.isIn(new Point(x[0], y[0]), new Point(x[1], y[1]))) {
-                        imageInfo.selectArea(new Point(x[0], y[0]), new Point(x[1], y[1]), new Color(255, 0, 0));
+                        let area = [new Point(x[0], y[0]), new Point(x[1], y[1])];
+                        imageInfo.selectArea(area[0], area[1], new Color(255, 0, 0));
+                        areas.push(area);
                         isContained = true;
                     }
                 })
             })
-        })
+        });
+
+        return areas;
     }
 
 }

@@ -12,6 +12,7 @@
     "test": "npm run unit"
   },
   "dependencies": {
+    "keras-js": "^1.0.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.3",
     "vue": "^2.2.6"
