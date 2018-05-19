@@ -42,6 +42,41 @@ class ImageInfo {
         return new ImageInfo(this.toImageData(newMatrix, pointY.x - pointX.x, pointY.y - pointX.y));
     }
 
+    // getClipInstance(pointX, pointY) {
+    //     let cs = document.createElement('canvas');
+    //     document.querySelector('body').appendChild(cs);
+    //     cs.height = 500;
+    //     cs.width = 500;
+    //     // cs.height = pointY.y - pointX.y;
+    //     // cs.width = pointY.x - pointX.x;
+    //     let context = cs.getContext('2d');
+    //     context.putImageData(
+    //         this.toImageData(), 
+    //         0,
+    //         0,
+    //         0,
+    //         0,
+    //         500,
+    //         500
+    //     );
+    //     context.drawImage(
+    //         bitmap,
+    //         pointX.x,
+    //         pointX.y,
+    //         pointY.x - pointX.x,
+    //         pointY.y - pointX.x,
+    //         0,
+    //         0,
+    //         pointY.x - pointX.x,
+    //         pointY.y - pointX.x
+    //     )
+    //     return new ImageInfo(context.getImageData(0, 0, cs.width, cs.height));
+    // }
+
+    clone() {
+        return this.getClipInstance(new Point(0, 0), new Point(this.width, this.height));
+    }
+
     selectArea(pointX, pointY, color) {
         color = color || new Color(255, 0, 0);
         this._lineTo(pointX, new Point(pointX.x, pointY.y), color);

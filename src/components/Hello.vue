@@ -3,7 +3,8 @@
         <canvas ref="imageCanvas" @mousedown="handleMouseDown"></canvas>
         <div class="container">
             <canvas ref="selectionCanvas"></canvas>
-            <canvas class="Ocr-canvas" ref="OCRcanvas"></canvas>
+            <canvas class="ocr-canvas" ref="OCRcanvas"></canvas>
+            <canvas class="ocr-canvas" id="tmpCanvas"></canvas>
             <div class="result-images-container">
                 <canvas v-for="(i, index) in resultImages" :key="index" ref="results"></canvas>
             </div>
@@ -69,8 +70,12 @@ export default {
                     let getImgHeight = img.height;
                     let imageData = context.getImageData(offsetX, offsetY, getImgWidth, getImgHeight);
                     this.imageInfo = new ImageInfo(imageData);
-                    this.selectStart = new Point(225, 162);
-                    this.selectEnd = new Point(305, 334);
+                    this.selectStart = new Point(1010, 81);
+                    this.selectEnd = new Point(1044, 196);
+                    // this.selectStart = new Point(225, 162);
+                    // this.selectEnd = new Point(305, 334);
+                    // this.selectStart = new Point(231, 516);
+                    // this.selectEnd = new Point(308, 647);
                     this.updateImage();
                 });
         },
@@ -87,20 +92,19 @@ export default {
 
             let imageInfo = ImageProcessor.toBinaryImage(newImageInfo);
             CCLProcessor.label(imageInfo);
-            let areas = TextProcessor.findText(imageInfo);
+            let charImageInfos = TextProcessor.findText(imageInfo);
             let ct2 = this.$refs.OCRcanvas.getContext('2d');
             this.$refs.OCRcanvas.width = imageInfo.width;
             this.$refs.OCRcanvas.height = imageInfo.height;
             ct2.putImageData(imageInfo.toImageData(), startX, startY);
 
-            this.resultImages = areas.length;
+            this.resultImages = charImageInfos.length;
             let resultImageInfo = ImageProcessor.toBinaryImage(newImageInfo);
             setTimeout(() => {
-                for (let i = 0; i < areas.length; i++) {
-                    let textImageInfo = resultImageInfo.getClipInstance(areas[i][0], areas[i][1]);
-                    this.$refs.results[i].width = textImageInfo.width;
-                    this.$refs.results[i].height = textImageInfo.height;
-                    this.$refs.results[i].getContext('2d').putImageData(textImageInfo.toImageData(), startX, startY);
+                for (let i = 0; i < charImageInfos.length; i++) {
+                    this.$refs.results[i].width = charImageInfos[i].width;
+                    this.$refs.results[i].height = charImageInfos[i].height;
+                    this.$refs.results[i].getContext('2d').putImageData(charImageInfos[i].toImageData(), startX, startY);
                 }
             }, 100);
         },
@@ -144,7 +148,7 @@ export default {
     > .result-images-container {
         display: flex;
         margin-top: 150px;
-        transform: scale(2);
+        // transform: scale(2);
         canvas {
             margin: 10px;
         }
