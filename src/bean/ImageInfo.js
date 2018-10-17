@@ -27,10 +27,7 @@ class ImageInfo {
                 data.push(pixel.a);
             });
         });
-        let result = new window.ImageData((width || this.width), (height || this.height));
-        for (let i = 0; i < result.data.length; i++) {
-            result.data[i] = data[i];
-        }
+        let result = new window.ImageData(new Uint8ClampedArray(data), (width || this.width), (height || this.height));
         return result;
     }
 
